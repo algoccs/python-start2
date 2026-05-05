@@ -105,8 +105,10 @@ while run:
         window.blit(background, (0, 0))
         puntos_txt = font_1.render(f'PUNTOS: {puntos}', 1, WHITE)
         fallos_txt = font_1.render(f'FALLOS: {fallos}', 1, WHITE)
+        vidas_txt = font_1.render(f'VIDAS: {vidas}', 1, WHITE)
         window.blit(puntos_txt, (40, 40))
-        window.blit(fallos_txt, (40, 80))
+        window.blit(fallos_txt, (40, 70))
+        window.blit(vidas_txt, (40, 110))
 
         player.reset(window)
         player.update()
@@ -115,8 +117,19 @@ while run:
         balas.draw(window)
         balas.update()
 
+        collision = sprite.groupcollide(balas, aliens, True, True)
+        for c in collision:
+            puntos += 1
+            enemy = Enemy(ENEMY_IMG, randint(0, ANCHO - 60), -60, 80, 60, randint(1, 6))
+            aliens.add(enemy)
+
+        if sprite.spritecollide(player, aliens, True):
+            vidas -= 1
+            enemy = Enemy(ENEMY_IMG, randint(0, ANCHO - 60), -60, 80, 60, randint(1, 6))
+            aliens.add(enemy)
+
         # CONDICION DE DERROTA:
-        if fallos >= 10:
+        if fallos >= 10 or vidas <= 0:
             finish = True
             window.fill(BLACK)
             game_over = transform.scale(image.load(GAMEOVER_IMG), (ANCHO, ALTO))
@@ -127,13 +140,12 @@ while run:
         # CONDICION DE VICTORIA
         if puntos == 20:
             finish = True
-            window.fill(BLACK)
+            window.fill(WHITE)
             # RENDERIZAR IMAGEN DE VICTORIA
 
 
     if finish:
         mixer.music.stop()
-
 
     # NO TOCAR
     display.update()
