@@ -74,11 +74,15 @@ font_2 = font.Font(GAME_FONT, 60)
 player = Player(PLAYER_IMG, (ANCHO - 60) // 2, ALTO - 60, 60, 60, 5)
 balas = sprite.Group()
 aliens = sprite.Group()
+asteroids = sprite.Group()
 
 for i in range(5):
     enemy = Enemy(ENEMY_IMG, randint(0, ANCHO - 60), -60, 80, 60, randint(1, 6))
     aliens.add(enemy)
 
+for i in range (3):
+    rock = Enemy(ROCK_IMG, randint(0, ANCHO - 60), -40, 40, 40, randint(3, 7))
+    asteroids.add(rock)
 
 # fondo
 background = transform.scale(image.load(BACKGROUND_IMG), (ANCHO, ALTO))
@@ -94,7 +98,7 @@ while run:
         if e.type == KEYDOWN:
             if e.key == K_SPACE:
                 player.fire()
-                puntos += 1
+
             if e.key == K_r:
                 finish = False
                 vidas = 5
@@ -115,8 +119,12 @@ while run:
         player.update()
         aliens.draw(window)
         aliens.update()
+        asteroids.draw(window)
+        asteroids.update()
         balas.draw(window)
         balas.update()
+
+        obst = sprite.groupcollide(balas, asteroids, True, False)
 
         collision = sprite.groupcollide(balas, aliens, True, True)
         for c in collision:
