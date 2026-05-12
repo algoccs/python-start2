@@ -1,6 +1,7 @@
 from pygame import *
 from random import *
 from config import *
+from time import time as timer
 
 init()
 font.init()
@@ -9,7 +10,8 @@ mixer.init()
 # parametros iniciales
 vidas = 5
 puntos = 0
-fallos = 0 # VARIABLE GLOBAL
+fallos = 0
+num_balas = 0
 
 # SONIDOS
 # Musica de fondo
@@ -53,7 +55,7 @@ class Enemy(GameSprite):
         if self.rect.y >= ALTO: # El enemigo cruza el borde inferior de la pantalla
             self.rect.y = -self.height
             self.rect.x = randint(0, ANCHO - 60)
-            self.speed = randint(1, 6)
+            self.speed = randint(1, 4)
             fallos += 1
 
 class Bullet(GameSprite):
@@ -77,7 +79,7 @@ aliens = sprite.Group()
 asteroids = sprite.Group()
 
 for i in range(5):
-    enemy = Enemy(ENEMY_IMG, randint(0, ANCHO - 60), -60, 80, 60, randint(1, 6))
+    enemy = Enemy(ENEMY_IMG, randint(0, ANCHO - 60), -60, 80, 60, randint(1, 4))
     aliens.add(enemy)
 
 for i in range (3):
@@ -87,8 +89,10 @@ for i in range (3):
 # fondo
 background = transform.scale(image.load(BACKGROUND_IMG), (ANCHO, ALTO))
 
+
 run = True
 finish = False
+reloading = False
 clock = time.Clock()
 
 while run:
@@ -97,14 +101,21 @@ while run:
             run = False
         if e.type == KEYDOWN:
             if e.key == K_SPACE:
-                player.fire()
+                if num_balas < 5 and reloading == False:
+                    player.fire()
+                    num_balas += 1
+                if num_balas >= 5 and reloading == False:
+                    reloading = True
+                    timer_start = timer() # marcamos el tiempo
 
             if e.key == K_r:
                 finish = False
                 vidas = 5
                 puntos = 0
                 fallos = 0
-        
+                num_balas = 0
+
+
     if not finish:
         window.fill(BACK_COLOR)
         window.blit(background, (0, 0))
@@ -124,17 +135,29 @@ while run:
         balas.draw(window)
         balas.update()
 
+        # Mecanica de recarga
+        if reloading:
+            timer_finish = timer()
+
+            if timer_finish - timer_start < 2:
+                reload_text = font_1.render('RECARGANDO...', 1, YELLOW)
+                window.blit(reload_text, (150, ALTO // 2))
+            else:
+                num_balas = 0
+                reloading = False
+
+
         obst = sprite.groupcollide(balas, asteroids, True, False)
 
         collision = sprite.groupcollide(balas, aliens, True, True)
         for c in collision:
             puntos += 1
-            enemy = Enemy(ENEMY_IMG, randint(0, ANCHO - 60), -60, 80, 60, randint(1, 6))
+            enemy = Enemy(ENEMY_IMG, randint(0, ANCHO - 60), -60, 80, 60, randint(1, 4))
             aliens.add(enemy)
 
         if sprite.spritecollide(player, aliens, True):
             vidas -= 1
-            enemy = Enemy(ENEMY_IMG, randint(0, ANCHO - 60), -60, 80, 60, randint(1, 6))
+            enemy = Enemy(ENEMY_IMG, randint(0, ANCHO - 60), -60, 80, 60, randint(1, 4))
             aliens.add(enemy)
 
         # CONDICION DE DERROTA:
