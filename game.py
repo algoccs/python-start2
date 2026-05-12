@@ -68,7 +68,8 @@ window = display.set_mode((ANCHO, ALTO))
 display.set_caption(TITULO)
 
 # Trabajo con fuentes
-font_1 = font.Font(None, 30)
+font_1 = font.Font(GAME_FONT, 24)
+font_2 = font.Font(GAME_FONT, 60)
 
 player = Player(PLAYER_IMG, (ANCHO - 60) // 2, ALTO - 60, 60, 60, 5)
 balas = sprite.Group()
@@ -105,10 +106,10 @@ while run:
         window.blit(background, (0, 0))
         puntos_txt = font_1.render(f'PUNTOS: {puntos}', 1, WHITE)
         fallos_txt = font_1.render(f'FALLOS: {fallos}', 1, WHITE)
-        vidas_txt = font_1.render(f'VIDAS: {vidas}', 1, WHITE)
+        vidas_txt = font_2.render(f'{vidas}', 1, GREEN)
         window.blit(puntos_txt, (40, 40))
         window.blit(fallos_txt, (40, 70))
-        window.blit(vidas_txt, (40, 110))
+        window.blit(vidas_txt, (550, 40))
 
         player.reset(window)
         player.update()
@@ -134,7 +135,7 @@ while run:
             window.fill(BLACK)
             game_over = transform.scale(image.load(GAMEOVER_IMG), (ANCHO, ALTO))
             window.blit(game_over, (0, 0))
-            restart_txt = font_1.render(f'Presione "R" para reiniciar!', 1, WHITE)
+            restart_txt = font_1.render(f'"R" para reiniciar!', 1, WHITE)
             window.blit(restart_txt, (180, 420))
 
         # CONDICION DE VICTORIA
