@@ -161,7 +161,7 @@ while run:
             aliens.add(enemy)
 
         # CONDICION DE DERROTA:
-        if fallos >= 10 or vidas <= 0:
+        if fallos >= 10 or vidas <= 0 or sprite.spritecollide(player, asteroids, True):
             finish = True
             window.fill(BLACK)
             game_over = transform.scale(image.load(GAMEOVER_IMG), (ANCHO, ALTO))
@@ -174,6 +174,8 @@ while run:
             finish = True
             window.fill(WHITE)
             # RENDERIZAR IMAGEN DE VICTORIA
+
+
 
 
     if finish:
